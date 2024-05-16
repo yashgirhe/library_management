@@ -1,4 +1,4 @@
-package com.library.management.models;
+package com.library.management.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

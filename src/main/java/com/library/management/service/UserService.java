@@ -1,13 +1,13 @@
 package com.library.management.service;
 
-import com.library.management.models.User;
+import com.library.management.entities.User;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class UserService {
+public class UserService{
     List<User> list = new ArrayList<>();
 
     public UserService() {
