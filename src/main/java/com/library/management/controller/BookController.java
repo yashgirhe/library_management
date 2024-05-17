@@ -1,6 +1,7 @@
 package com.library.management.controller;
 
 import com.library.management.entities.Book;
+import com.library.management.exceptionhandler.DuplicateTitleException;
 import com.library.management.exceptionhandler.ResourceNotFoundException;
 import com.library.management.service.BookService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,8 +42,11 @@ public class BookController {
                     content = @Content)})
     @PostMapping("/")
     public ResponseEntity<Book> addBook(@Valid @RequestBody Book book) {
-        Book savedBook = bookService.addBook(book);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedBook);
+        if (bookService.getBookByName(book.getTitle()) == null){
+            Book savedBook = bookService.addBook(book);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedBook);
+        }
+        throw new DuplicateTitleException("Book with title '" + book.getTitle() + "' already exists.");
     }
 
     @Operation(
@@ -69,7 +73,7 @@ public class BookController {
     }
 
     @Operation(
-            summary = "Retrieve all books from database"
+            summary = "Retrieve all books"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
