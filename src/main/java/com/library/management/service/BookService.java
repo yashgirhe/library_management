@@ -6,22 +6,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BookService {
 
     @Autowired
     BookRepository bookRepository;
-    public Book addBook(Book book){
+
+    public Book addBook(Book book) {
         return bookRepository.save(book);
     }
-    public Book getBookByName(String name){
+
+    public Book getBookByName(String name) {
         return bookRepository.findByTitle(name);
     }
-    public List<Book> getAllBooks(){
+
+    public Optional<Book> getBookById(int id) {
+        return bookRepository.findById(id);
+    }
+
+    public List<Book> getAllBooks() {
         return bookRepository.findAll();
     }
-    public Book updateBook(String name,Book book){
+
+    public Book updateBook(String name, Book book) {
         Book bookToBeUpdated = bookRepository.findByTitle(name);
         bookToBeUpdated.setTitle(book.getTitle());
         bookToBeUpdated.setAuthor(book.getAuthor());
@@ -29,10 +38,12 @@ public class BookService {
         bookToBeUpdated.setIssuedBy(book.getIssuedBy());
         return bookRepository.save(bookToBeUpdated);
     }
-    public void deleteByName(String name){
+
+    public void deleteByName(String name) {
         bookRepository.removeByTitle(name);
     }
-    public void deleteById(int id){
+
+    public void deleteById(int id) {
         bookRepository.deleteById(id);
     }
 }
