@@ -1,28 +1,38 @@
 package com.library.management.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.stereotype.Component;
 
+import java.util.List;
+
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Component
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = "username")})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private @Getter
+    private
     @Setter int id;
-    private @Getter
+
+    @NotEmpty(message = "Username is mandatory")
+    private
     @Setter String username;
-    private @Getter
+    @NotEmpty(message = "Password is mandatory")
+    private
     @Setter String password;
-    private @Getter
+
+    private
     @Setter String role;
-    private @Getter
-    @Setter int bookId;
+
+    @OneToOne(mappedBy = "user")
+    private
+    @Setter Book issuedBook;
 }

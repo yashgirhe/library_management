@@ -16,13 +16,17 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private @Getter
     @Setter int id;
+
     @NotEmpty(message = "Title is mandatory")
     private @Getter
     @Setter String title;
+
     private @Getter
     @Setter String author;
     private @Getter
     @Setter Boolean isIssued;
-    private @Getter
-    @Setter String issuedBy;
+
+    @OneToOne
+    @JoinColumn(name = "username", referencedColumnName = "username")
+    private @Getter @Setter User user;
 }

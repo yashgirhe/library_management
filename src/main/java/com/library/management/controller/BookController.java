@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/book")
+@RequestMapping("/admin/book")
 @Validated
-@Tag(name = "BookController", description = "Perform CRUD operations on books")
+@Tag(name = "Book", description = "Perform CRUD operations on books")
 public class BookController {
 
     @Autowired
