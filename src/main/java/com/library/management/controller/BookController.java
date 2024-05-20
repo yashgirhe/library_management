@@ -1,7 +1,7 @@
 package com.library.management.controller;
 
+import com.library.management.dto.BookDto;
 import com.library.management.entities.Book;
-import com.library.management.exceptionhandler.DuplicateTitleException;
 import com.library.management.exceptionhandler.ResourceNotFoundException;
 import com.library.management.service.BookService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,17 +36,19 @@ public class BookController {
             @ApiResponse(responseCode = "201", description = "Book added successfully",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = Book.class))}),
-            @ApiResponse(responseCode = "400", description = "Invalid input",
-                    content = @Content),
-            @ApiResponse(responseCode = "500", description = "Internal server error",
-                    content = @Content)})
+            @ApiResponse(responseCode = "400", description = "Bad Request: Invalid data or user already has a book issued",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Book.class))}),
+            @ApiResponse(responseCode = "404", description = "Not Found: User not found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Book.class))}),
+            @ApiResponse(responseCode = "409", description = "Conflict: Book with the given title already exists",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Book.class))})})
     @PostMapping("/")
-    public ResponseEntity<Book> addBook(@Valid @RequestBody Book book) {
-        if (bookService.getBookByName(book.getTitle()) == null){
-            Book savedBook = bookService.addBook(book);
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedBook);
-        }
-        throw new DuplicateTitleException("Book with title '" + book.getTitle() + "' already exists.");
+    public ResponseEntity<Book> addBook(@Valid @RequestBody BookDto bookDto) {
+        Book savedBook = bookService.addBook(bookDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedBook);
     }
 
     @Operation(
@@ -64,8 +66,8 @@ public class BookController {
                             schema = @Schema(implementation = Book.class))}),
     })
     @GetMapping("/{name}")
-    public ResponseEntity<Book> getBookByName(@PathVariable("name") String name) {
-        Book book = bookService.getBookByName(name);
+    public ResponseEntity<BookDto> getBookByName(@PathVariable("name") String name) {
+        BookDto book = bookService.getBookByName(name);
         if (book == null) {
             throw new ResourceNotFoundException("Book not found with name: " + name);
         }
@@ -82,8 +84,8 @@ public class BookController {
                             schema = @Schema(implementation = Book.class))})
     })
     @GetMapping("/")
-    public ResponseEntity<List<Book>> getAllBooks() {
-        List<Book> list = bookService.getAllBooks();
+    public ResponseEntity<List<BookDto>> getAllBooks() {
+        List<BookDto> list = bookService.getAllBooks();
         return ResponseEntity.ok(list);
     }
 
@@ -107,7 +109,7 @@ public class BookController {
     })
     @PutMapping("/{name}")
     public ResponseEntity<Book> updateBook(@PathVariable("name") String name, @Valid @RequestBody Book book) {
-        Book isPresent = bookService.getBookByName(name);
+        BookDto isPresent = bookService.getBookByName(name);
         if (isPresent == null) {
             throw new ResourceNotFoundException("Book not found with name: " + name);
         } else {
@@ -132,7 +134,7 @@ public class BookController {
     })
     @DeleteMapping("/{name}")
     public ResponseEntity<?> deleteBookByName(@PathVariable("name") String name) {
-        Book book = bookService.getBookByName(name);
+        BookDto book = bookService.getBookByName(name);
         if (book == null) {
             throw new ResourceNotFoundException("Book not found with name: " + name);
         } else {

@@ -1,5 +1,6 @@
 package com.library.management.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
@@ -8,31 +9,26 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
-@Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Entity
 @Component
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = "username")})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private
-    @Setter int id;
+    private int id;
 
     @NotEmpty(message = "Username is mandatory")
-    private
-    @Setter String username;
+    private String username;
     @NotEmpty(message = "Password is mandatory")
-    private
-    @Setter String password;
+    private String password;
 
-    private
-    @Setter String role;
+    private String role;
 
     @OneToOne(mappedBy = "user")
-    private
-    @Setter Book issuedBook;
+    @JsonBackReference
+    private Book issuedBook;
 }

@@ -1,5 +1,6 @@
 package com.library.management.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
@@ -9,24 +10,23 @@ import lombok.Setter;
 
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = "title")})
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private @Getter
-    @Setter int id;
+    private int id;
 
     @NotEmpty(message = "Title is mandatory")
-    private @Getter
-    @Setter String title;
+    private String title;
 
-    private @Getter
-    @Setter String author;
-    private @Getter
-    @Setter Boolean isIssued;
+    private String author;
+    private Boolean isIssued;
 
     @OneToOne
     @JoinColumn(name = "username", referencedColumnName = "username")
-    private @Getter @Setter User user;
+    @JsonManagedReference
+    private User user;
 }

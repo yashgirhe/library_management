@@ -9,53 +9,50 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @SpringBootApplication
 @OpenAPIDefinition(
-		info = @Info(
-				title = "Library API",
-				version = "1.0.0",
-				description = "Library API documentation"
-		),
-		servers = @Server(
-				url = "http://localhost:8080/",
-				description = "Library API"
-		))
-public class LibraryManagementApplication  implements CommandLineRunner{
+        info = @Info(
+                title = "Library API",
+                version = "1.0.0",
+                description = "Library API documentation"
+        ),
+        servers = @Server(
+                url = "http://localhost:8080/",
+                description = "Library API"
+        ))
+public class LibraryManagementApplication implements CommandLineRunner {
 
-	@Autowired
-	private UserRepository userRepository;
-	@Autowired
-	private BCryptPasswordEncoder passwordEncoder;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
-	public static void main(String[] args) {
-		SpringApplication.run(LibraryManagementApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(LibraryManagementApplication.class, args);
+    }
 
-	@Override
-	public void run(String... args) throws Exception {
-		User user1 = new User();
-		user1.setUsername("ronaldo");
-		user1.setPassword(this.passwordEncoder.encode("ronaldo"));
-		user1.setRole("ADMIN");
-		Optional<User> userExist1 = Optional.ofNullable(this.userRepository.findByUsername("ronaldo"));
-		if (userExist1.isEmpty()) {
-			this.userRepository.save(user1);
-		}
+    @Override
+    public void run(String... args) throws Exception {
+        User user1 = new User();
+        user1.setUsername("admin");
+        user1.setPassword(this.passwordEncoder.encode("admin"));
+        user1.setRole("ADMIN");
+        Optional<User> userExist1 = Optional.ofNullable(this.userRepository.findByUsername("admin"));
+        if (userExist1.isEmpty()) {
+            this.userRepository.save(user1);
+        }
 
-		User user2 = new User();
-		user2.setUsername("messi");
-		user2.setPassword(this.passwordEncoder.encode("messi"));
-		user2.setRole("USER");
-		Optional<User> userExist2 = Optional.ofNullable(this.userRepository.findByUsername("messi"));
-		if (userExist2.isEmpty()) {
-			this.userRepository.save(user2);
-		}
-	}
+        User user2 = new User();
+        user2.setUsername("user1");
+        user2.setPassword(this.passwordEncoder.encode("user1"));
+        user2.setRole("USER");
+        Optional<User> userExist2 = Optional.ofNullable(this.userRepository.findByUsername("user1"));
+        if (userExist2.isEmpty()) {
+            this.userRepository.save(user2);
+        }
+    }
 }
