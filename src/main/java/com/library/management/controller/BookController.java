@@ -2,7 +2,6 @@ package com.library.management.controller;
 
 import com.library.management.dto.BookDto;
 import com.library.management.entities.Book;
-import com.library.management.exceptionhandler.ResourceNotFoundException;
 import com.library.management.service.BookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,7 +17,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/admin/book")
@@ -68,9 +66,6 @@ public class BookController {
     @GetMapping("/{name}")
     public ResponseEntity<BookDto> getBookByName(@PathVariable("name") String name) {
         BookDto book = bookService.getBookByName(name);
-        if (book == null) {
-            throw new ResourceNotFoundException("Book not found with name: " + name);
-        }
         return ResponseEntity.ok(book);
     }
 
@@ -108,14 +103,10 @@ public class BookController {
                             schema = @Schema(implementation = Book.class))}),
     })
     @PutMapping("/{name}")
-    public ResponseEntity<Book> updateBook(@PathVariable("name") String name, @Valid @RequestBody Book book) {
-        BookDto isPresent = bookService.getBookByName(name);
-        if (isPresent == null) {
-            throw new ResourceNotFoundException("Book not found with name: " + name);
-        } else {
-            Book updatedBook = bookService.updateBook(name, book);
-            return ResponseEntity.status(HttpStatus.OK).body(updatedBook);
-        }
+    public ResponseEntity<BookDto> updateBook(@PathVariable("name") String name, @Valid @RequestBody BookDto book) {
+        bookService.getBookByName(name);
+        BookDto updatedBook = bookService.updateBook(name, book);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedBook);
     }
 
     @Operation(
@@ -134,13 +125,9 @@ public class BookController {
     })
     @DeleteMapping("/{name}")
     public ResponseEntity<?> deleteBookByName(@PathVariable("name") String name) {
-        BookDto book = bookService.getBookByName(name);
-        if (book == null) {
-            throw new ResourceNotFoundException("Book not found with name: " + name);
-        } else {
-            bookService.deleteByName(name);
-            return ResponseEntity.ok(HttpStatus.OK);
-        }
+        bookService.getBookByName(name);
+        bookService.deleteByName(name);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @Operation(
@@ -159,12 +146,8 @@ public class BookController {
     })
     @DeleteMapping("/id/{id}")
     public ResponseEntity<?> deleteBookById(@PathVariable("id") int id) {
-        Optional<Book> book = bookService.getBookById(id);
-        if (book.isEmpty() || book.get().getId() != id) {
-            throw new ResourceNotFoundException("Book not found with id: " + id);
-        } else {
-            bookService.deleteById(id);
-            return ResponseEntity.ok(HttpStatus.OK);
-        }
+        bookService.getBookById(id);
+        bookService.deleteById(id);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 }
