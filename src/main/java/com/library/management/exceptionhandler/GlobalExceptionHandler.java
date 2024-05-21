@@ -30,8 +30,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(DuplicateTitleException.class)
-    public ResponseEntity<ErrorResponse> handleDuplicateTitleException(DuplicateTitleException ex) {
+    @ExceptionHandler(DuplicateEntryException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateTitleException(DuplicateEntryException ex) {
         ErrorResponse errorResponse = new ErrorResponse(ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }

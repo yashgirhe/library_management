@@ -16,7 +16,7 @@ import lombok.Setter;
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = "title")})
 public class Book {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
     @NotEmpty(message = "Title is mandatory")

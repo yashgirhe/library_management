@@ -16,7 +16,7 @@ import java.util.Optional;
 @SpringBootApplication
 @OpenAPIDefinition(
         info = @Info(
-                title = "Library API",
+                title = "Library Management API",
                 version = "1.0.0",
                 description = "Library API documentation"
         ),

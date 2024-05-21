@@ -46,7 +46,7 @@ public class BookController {
     @PostMapping("/")
     public ResponseEntity<Book> addBook(@Valid @RequestBody BookDto bookDto) {
         Book savedBook = bookService.addBook(bookDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedBook);
+        return new ResponseEntity<>(savedBook, HttpStatus.CREATED);
     }
 
     @Operation(
@@ -66,7 +66,7 @@ public class BookController {
     @GetMapping("/{name}")
     public ResponseEntity<BookDto> getBookByName(@PathVariable("name") String name) {
         BookDto book = bookService.getBookByName(name);
-        return ResponseEntity.ok(book);
+        return new ResponseEntity<>(book, HttpStatus.OK);
     }
 
     @Operation(
@@ -81,7 +81,7 @@ public class BookController {
     @GetMapping("/")
     public ResponseEntity<List<BookDto>> getAllBooks() {
         List<BookDto> list = bookService.getAllBooks();
-        return ResponseEntity.ok(list);
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
     @Operation(
@@ -106,7 +106,7 @@ public class BookController {
     public ResponseEntity<BookDto> updateBook(@PathVariable("name") String name, @Valid @RequestBody BookDto book) {
         bookService.getBookByName(name);
         BookDto updatedBook = bookService.updateBook(name, book);
-        return ResponseEntity.status(HttpStatus.OK).body(updatedBook);
+        return new ResponseEntity<>(updatedBook, HttpStatus.OK);
     }
 
     @Operation(
@@ -114,7 +114,7 @@ public class BookController {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "204",
+                    responseCode = "202",
                     description = "Book deleted Successfully",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = Book.class))}),
@@ -127,7 +127,7 @@ public class BookController {
     public ResponseEntity<?> deleteBookByName(@PathVariable("name") String name) {
         bookService.getBookByName(name);
         bookService.deleteByName(name);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
     @Operation(
@@ -135,7 +135,7 @@ public class BookController {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "204",
+                    responseCode = "202",
                     description = "Book deleted Successfully",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = Book.class))}),
@@ -148,6 +148,6 @@ public class BookController {
     public ResponseEntity<?> deleteBookById(@PathVariable("id") int id) {
         bookService.getBookById(id);
         bookService.deleteById(id);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

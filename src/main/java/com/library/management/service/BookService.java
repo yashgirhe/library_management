@@ -3,7 +3,7 @@ package com.library.management.service;
 import com.library.management.dto.BookDto;
 import com.library.management.entities.Book;
 import com.library.management.entities.User;
-import com.library.management.exceptionhandler.DuplicateTitleException;
+import com.library.management.exceptionhandler.DuplicateEntryException;
 import com.library.management.exceptionhandler.ResourceNotFoundException;
 import com.library.management.repository.BookRepository;
 import com.library.management.repository.UserRepository;
@@ -26,7 +26,7 @@ public class BookService {
         //check if book already exist by title
         Optional<Book> bookExistByTitle = Optional.ofNullable(bookRepository.findByTitle(bookDto.getTitle()));
         if (bookExistByTitle.isPresent()) {
-            throw new DuplicateTitleException("Book with title '" + bookDto.getTitle() + "' already exists.");
+            throw new DuplicateEntryException("Book with title '" + bookDto.getTitle() + "' already exists.");
         }
         Book book = new Book();
         book.setTitle(bookDto.getTitle());
