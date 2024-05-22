@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/admin/book")
 @Validated
 @Tag(name = "Book", description = "Perform CRUD operations on books")
 public class BookController {
@@ -43,7 +42,7 @@ public class BookController {
             @ApiResponse(responseCode = "409", description = "Conflict: Book with the given title already exists",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = Book.class))})})
-    @PostMapping("/")
+    @PostMapping("/admin/book")
     public ResponseEntity<Book> addBook(@Valid @RequestBody BookDto bookDto) {
         Book savedBook = bookService.addBook(bookDto);
         return new ResponseEntity<>(savedBook, HttpStatus.CREATED);
@@ -63,7 +62,7 @@ public class BookController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = Book.class))}),
     })
-    @GetMapping("/{name}")
+    @GetMapping("/public/book/{name}")
     public ResponseEntity<BookDto> getBookByName(@PathVariable("name") String name) {
         BookDto book = bookService.getBookByName(name);
         return new ResponseEntity<>(book, HttpStatus.OK);
@@ -78,7 +77,7 @@ public class BookController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = Book.class))})
     })
-    @GetMapping("/")
+    @GetMapping("/public/book")
     public ResponseEntity<List<BookDto>> getAllBooks() {
         List<BookDto> list = bookService.getAllBooks();
         return new ResponseEntity<>(list, HttpStatus.OK);
@@ -102,7 +101,7 @@ public class BookController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = Book.class))}),
     })
-    @PutMapping("/{name}")
+    @PutMapping("/admin/book/{name}")
     public ResponseEntity<BookDto> updateBook(@PathVariable("name") String name, @Valid @RequestBody BookDto book) {
         bookService.getBookByName(name);
         BookDto updatedBook = bookService.updateBook(name, book);
@@ -123,7 +122,7 @@ public class BookController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = Book.class))}),
     })
-    @DeleteMapping("/{name}")
+    @DeleteMapping("/admin/book/{name}")
     public ResponseEntity<?> deleteBookByName(@PathVariable("name") String name) {
         bookService.getBookByName(name);
         bookService.deleteByName(name);
@@ -144,7 +143,7 @@ public class BookController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = Book.class))}),
     })
-    @DeleteMapping("/id/{id}")
+    @DeleteMapping("/admin/book/{id}")
     public ResponseEntity<?> deleteBookById(@PathVariable("id") int id) {
         bookService.getBookById(id);
         bookService.deleteById(id);

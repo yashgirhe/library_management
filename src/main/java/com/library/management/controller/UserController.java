@@ -1,7 +1,7 @@
 package com.library.management.controller;
 
-import com.library.management.dto.AdminControllUserDto;
-import com.library.management.dto.UserControllUserDto;
+import com.library.management.dto.AdminControlUserDto;
+import com.library.management.dto.UserControlUserDto;
 import com.library.management.dto.UserDto;
 import com.library.management.entities.User;
 import com.library.management.service.UserService;
@@ -22,7 +22,6 @@ import java.util.List;
 
 @RestController
 @Validated
-@RequestMapping("/admin/user")
 @Tag(name = "User", description = "Perform CRUD operations on user")
 public class UserController {
 
@@ -43,7 +42,7 @@ public class UserController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = User.class))}),
     })
-    @GetMapping("/{username}")
+    @GetMapping("/public/user/{username}")
     public ResponseEntity<UserDto> getUserByName(@PathVariable("username") String username) {
         UserDto user = userService.getUserByName(username);
         return ResponseEntity.ok(user);
@@ -58,7 +57,7 @@ public class UserController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = User.class))})
     })
-    @GetMapping("/")
+    @GetMapping("/public/user")
     public ResponseEntity<List<UserDto>> getAllUsers() {
         List<UserDto> list = userService.getAllUsers();
         return ResponseEntity.ok(list);
@@ -77,7 +76,7 @@ public class UserController {
             @ApiResponse(responseCode = "409", description = "Conflict: User with the given name already exists",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = User.class))})})
-    @PostMapping("/")
+    @PostMapping("/public/user")
     public ResponseEntity<User> addUser(@Valid @RequestBody UserDto userDto) {
         User userAdded = userService.addUser(userDto);
         return new ResponseEntity<>(userAdded, HttpStatus.CREATED);
@@ -102,10 +101,10 @@ public class UserController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = User.class))}),
     })
-    @PatchMapping("/p1/{username}")
-    public ResponseEntity<UserDto> updateUserByAdmin(@Valid @RequestBody AdminControllUserDto adminControllUserDto, @PathVariable("username") String username) {
+    @PatchMapping("/admin/user/{username}")
+    public ResponseEntity<UserDto> updateUserByAdmin(@Valid @RequestBody AdminControlUserDto adminControlUserDto, @PathVariable("username") String username) {
         userService.getUserByName(username);
-        UserDto userUpdated = userService.updateUserByAdmin(adminControllUserDto, username);
+        UserDto userUpdated = userService.updateUserByAdmin(adminControlUserDto, username);
         return new ResponseEntity<>(userUpdated, HttpStatus.OK);
     }
 
@@ -128,10 +127,10 @@ public class UserController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = User.class))}),
     })
-    @PatchMapping("/p2/{username}")
-    public ResponseEntity<UserDto> updateByUser(@Valid @RequestBody UserControllUserDto userControllUserDto, @PathVariable("username") String username) {
+    @PatchMapping("/user/user/{username}")
+    public ResponseEntity<UserDto> updateByUser(@Valid @RequestBody UserControlUserDto userControlUserDto, @PathVariable("username") String username) {
         userService.getUserByName(username);
-        UserDto userUpdated = userService.updateByUser(userControllUserDto, username);
+        UserDto userUpdated = userService.updateByUser(userControlUserDto, username);
         return new ResponseEntity<>(userUpdated, HttpStatus.OK);
     }
 
@@ -149,7 +148,7 @@ public class UserController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = User.class))}),
     })
-    @DeleteMapping("/{username}")
+    @DeleteMapping("/admin/user/{username}")
     public ResponseEntity<?> deleteUserByUsername(@PathVariable("username") String username) {
         userService.getUserByName(username);
         userService.deleteUserByName(username);

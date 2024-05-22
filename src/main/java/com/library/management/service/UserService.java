@@ -1,7 +1,7 @@
 package com.library.management.service;
 
-import com.library.management.dto.AdminControllUserDto;
-import com.library.management.dto.UserControllUserDto;
+import com.library.management.dto.AdminControlUserDto;
+import com.library.management.dto.UserControlUserDto;
 import com.library.management.dto.UserDto;
 import com.library.management.entities.User;
 import com.library.management.exceptionhandler.DuplicateEntryException;
@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -73,11 +74,18 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public UserDto updateUserByAdmin(AdminControllUserDto userDto, String username) {
+    public UserDto updateUserByAdmin(AdminControlUserDto userDto, String username) {
         UserDto userDto1 = new UserDto();
         User user = userRepository.findByUsername(username);
+        //updated username passed should not be taken
+        if (userRepository.findByUsername(userDto.getUsername()) != null && !userDto.getUsername().equals(username)) {
+            throw new DuplicateEntryException("Username already exist");
+        }
         user.setUsername(userDto.getUsername());
         user.setRole(userDto.getRole());
+        if (!Arrays.asList("ADMIN", "USER").contains(userDto.getRole())) {
+            throw new ResourceNotFoundException("Assigned role should be either ADMIN or USER");
+        }
         userRepository.save(user);
 
         userDto1.setId(user.getId());
@@ -92,9 +100,13 @@ public class UserService {
         return userDto1;
     }
 
-    public UserDto updateByUser(UserControllUserDto userDto, String username) {
+    public UserDto updateByUser(UserControlUserDto userDto, String username) {
         UserDto userDto1 = new UserDto();
         User user = userRepository.findByUsername(username);
+        //updated username passed should not be taken
+        if (userRepository.findByUsername(userDto.getUsername()) != null && !userDto.getUsername().equals(username)) {
+            throw new DuplicateEntryException("Username already exist");
+        }
         user.setUsername(userDto.getUsername());
         user.setPassword(passwordEncoder().encode(userDto.getPassword()));
         userRepository.save(user);
