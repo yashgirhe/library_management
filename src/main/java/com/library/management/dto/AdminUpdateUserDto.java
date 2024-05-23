@@ -10,7 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class AdminControlUserDto {
+public class AdminUpdateUserDto {
 
     @NotEmpty(message = "Username is mandatory")
     private String username;

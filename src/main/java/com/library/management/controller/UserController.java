@@ -1,8 +1,9 @@
 package com.library.management.controller;
 
-import com.library.management.dto.AdminControlUserDto;
-import com.library.management.dto.UserControlUserDto;
-import com.library.management.dto.UserDto;
+import com.library.management.dto.AdminUpdateUserDto;
+import com.library.management.dto.PostUserDto;
+import com.library.management.dto.UserUpdateUserDto;
+import com.library.management.dto.GetUserDto;
 import com.library.management.entities.User;
 import com.library.management.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,8 +44,8 @@ public class UserController {
                             schema = @Schema(implementation = User.class))}),
     })
     @GetMapping("/public/user/{username}")
-    public ResponseEntity<UserDto> getUserByName(@PathVariable("username") String username) {
-        UserDto user = userService.getUserByName(username);
+    public ResponseEntity<GetUserDto> getUserByName(@PathVariable("username") String username) {
+        GetUserDto user = userService.getUserByName(username);
         return ResponseEntity.ok(user);
     }
 
@@ -58,8 +59,8 @@ public class UserController {
                             schema = @Schema(implementation = User.class))})
     })
     @GetMapping("/public/user")
-    public ResponseEntity<List<UserDto>> getAllUsers() {
-        List<UserDto> list = userService.getAllUsers();
+    public ResponseEntity<List<GetUserDto>> getAllUsers() {
+        List<GetUserDto> list = userService.getAllUsers();
         return ResponseEntity.ok(list);
     }
 
@@ -77,8 +78,8 @@ public class UserController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = User.class))})})
     @PostMapping("/public/user")
-    public ResponseEntity<User> addUser(@Valid @RequestBody UserDto userDto) {
-        User userAdded = userService.addUser(userDto);
+    public ResponseEntity<GetUserDto> addUser(@Valid @RequestBody PostUserDto getUserDto) {
+        GetUserDto userAdded = userService.addUser(getUserDto);
         return new ResponseEntity<>(userAdded, HttpStatus.CREATED);
     }
 
@@ -102,9 +103,9 @@ public class UserController {
                             schema = @Schema(implementation = User.class))}),
     })
     @PatchMapping("/admin/user/{username}")
-    public ResponseEntity<UserDto> updateUserByAdmin(@Valid @RequestBody AdminControlUserDto adminControlUserDto, @PathVariable("username") String username) {
+    public ResponseEntity<GetUserDto> updateUserByAdmin(@Valid @RequestBody AdminUpdateUserDto adminUpdateUserDto, @PathVariable("username") String username) {
         userService.getUserByName(username);
-        UserDto userUpdated = userService.updateUserByAdmin(adminControlUserDto, username);
+        GetUserDto userUpdated = userService.updateUserByAdmin(adminUpdateUserDto, username);
         return new ResponseEntity<>(userUpdated, HttpStatus.OK);
     }
 
@@ -128,9 +129,9 @@ public class UserController {
                             schema = @Schema(implementation = User.class))}),
     })
     @PatchMapping("/user/user/{username}")
-    public ResponseEntity<UserDto> updateByUser(@Valid @RequestBody UserControlUserDto userControlUserDto, @PathVariable("username") String username) {
+    public ResponseEntity<GetUserDto> updateByUser(@Valid @RequestBody UserUpdateUserDto userUpdateUserDto, @PathVariable("username") String username) {
         userService.getUserByName(username);
-        UserDto userUpdated = userService.updateByUser(userControlUserDto, username);
+        GetUserDto userUpdated = userService.updateUserByUser(userUpdateUserDto, username);
         return new ResponseEntity<>(userUpdated, HttpStatus.OK);
     }
 

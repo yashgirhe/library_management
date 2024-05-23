@@ -1,8 +1,9 @@
 package com.library.management.service;
 
-import com.library.management.dto.AdminControlUserDto;
-import com.library.management.dto.UserControlUserDto;
-import com.library.management.dto.UserDto;
+import com.library.management.dto.AdminUpdateUserDto;
+import com.library.management.dto.PostUserDto;
+import com.library.management.dto.UserUpdateUserDto;
+import com.library.management.dto.GetUserDto;
 import com.library.management.entities.User;
 import com.library.management.exceptionhandler.DuplicateEntryException;
 import com.library.management.exceptionhandler.ResourceNotFoundException;
@@ -26,56 +27,52 @@ public class UserService {
         return new BCryptPasswordEncoder();
     }
 
-    private UserDto convertToUserDto(User user) {
-        UserDto userDto = new UserDto();
-        userDto.setId(user.getId());
-        userDto.setUsername(user.getUsername());
-        userDto.setRole(user.getRole());
+    private GetUserDto convertToGetUserDto(User user) {
+        GetUserDto getUserDto = new GetUserDto();
+        getUserDto.setId(user.getId());
+        getUserDto.setUsername(user.getUsername());
+        getUserDto.setRole(user.getRole());
         // Check if the book object is null before accessing its properties
         if (user.getIssuedBook() != null) {
-            userDto.setIssuedBook(user.getIssuedBook().getTitle());
+            getUserDto.setIssuedBook(user.getIssuedBook().getTitle());
         } else {
-            userDto.setIssuedBook(null); // Or set a default value if necessary
+            getUserDto.setIssuedBook(null); // Or set a default value if necessary
         }
-        return userDto;
+        return getUserDto;
     }
 
-    private User convertDtoToUser(UserDto userDto) {
-        User user = new User();
-        user.setUsername(userDto.getUsername());
-        user.setPassword(passwordEncoder().encode(userDto.getPassword()));
-        user.setRole(userDto.getRole());
-        return user;
-    }
-
-    public UserDto getUserByName(String username) {
+    public GetUserDto getUserByName(String username) {
         User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new ResourceNotFoundException("User not found with name: " + username);
         }
         String issuedBook = (user.getIssuedBook() != null) ? user.getIssuedBook().getTitle() : null;
 
-        return convertToUserDto(user);
+        return convertToGetUserDto(user);
     }
 
-    public List<UserDto> getAllUsers() {
+    public List<GetUserDto> getAllUsers() {
         List<User> user = userRepository.findAll();
         return user.stream()
-                .map(this::convertToUserDto)
+                .map(this::convertToGetUserDto)
                 .collect(Collectors.toList());
     }
 
-    public User addUser(UserDto userDto) {
-        Optional<User> userPresent = Optional.ofNullable(userRepository.findByUsername(userDto.getUsername()));
+    public GetUserDto addUser(PostUserDto postUserDto) {
+        Optional<User> userPresent = Optional.ofNullable(userRepository.findByUsername(postUserDto.getUsername()));
         if (userPresent.isPresent()) {
-            throw new DuplicateEntryException("User with name '" + userDto.getUsername() + "' already exists.");
+            throw new DuplicateEntryException("User with name '" + postUserDto.getUsername() + "' already exists.");
         }
-        User user = convertDtoToUser(userDto);
-        return userRepository.save(user);
+        User user = new User();
+        user.setUsername(postUserDto.getUsername());
+        user.setPassword(passwordEncoder().encode(postUserDto.getPassword()));
+        user.setRole("USER");
+        userRepository.save(user);
+        return convertToGetUserDto(user);
     }
 
-    public UserDto updateUserByAdmin(AdminControlUserDto userDto, String username) {
-        UserDto userDto1 = new UserDto();
+    public GetUserDto updateUserByAdmin(AdminUpdateUserDto userDto, String username) {
+        GetUserDto getUserDto = new GetUserDto();
         User user = userRepository.findByUsername(username);
         //updated username passed should not be taken
         if (userRepository.findByUsername(userDto.getUsername()) != null && !userDto.getUsername().equals(username)) {
@@ -88,20 +85,19 @@ public class UserService {
         }
         userRepository.save(user);
 
-        userDto1.setId(user.getId());
-        userDto1.setUsername(user.getUsername());
-        userDto1.setPassword(user.getPassword());
-        userDto1.setRole(user.getRole());
+        getUserDto.setId(user.getId());
+        getUserDto.setUsername(user.getUsername());
+        getUserDto.setRole(user.getRole());
         if (user.getIssuedBook() == null) {
-            userDto1.setIssuedBook(null);
+            getUserDto.setIssuedBook(null);
         } else {
-            userDto1.setIssuedBook(user.getIssuedBook().getTitle());
+            getUserDto.setIssuedBook(user.getIssuedBook().getTitle());
         }
-        return userDto1;
+        return getUserDto;
     }
 
-    public UserDto updateByUser(UserControlUserDto userDto, String username) {
-        UserDto userDto1 = new UserDto();
+    public GetUserDto updateUserByUser(UserUpdateUserDto userDto, String username) {
+        GetUserDto getUserDto = new GetUserDto();
         User user = userRepository.findByUsername(username);
         //updated username passed should not be taken
         if (userRepository.findByUsername(userDto.getUsername()) != null && !userDto.getUsername().equals(username)) {
@@ -111,16 +107,15 @@ public class UserService {
         user.setPassword(passwordEncoder().encode(userDto.getPassword()));
         userRepository.save(user);
 
-        userDto1.setId(user.getId());
-        userDto1.setUsername(user.getUsername());
-        userDto1.setPassword(user.getPassword());
-        userDto1.setRole(user.getRole());
+        getUserDto.setId(user.getId());
+        getUserDto.setUsername(user.getUsername());
+        getUserDto.setRole(user.getRole());
         if (user.getIssuedBook() == null) {
-            userDto1.setIssuedBook(null);
+            getUserDto.setIssuedBook(null);
         } else {
-            userDto1.setIssuedBook(user.getIssuedBook().getTitle());
+            getUserDto.setIssuedBook(user.getIssuedBook().getTitle());
         }
-        return userDto1;
+        return getUserDto;
     }
 
     public void deleteUserByName(String name) {

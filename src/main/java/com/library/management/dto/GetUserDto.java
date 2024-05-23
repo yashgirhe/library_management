@@ -10,18 +10,10 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class UserDto {
+public class GetUserDto {
 
     private int id;
-
-    @NotEmpty(message = "Username is mandatory")
     private String username;
-
-    @NotEmpty(message = "Password is mandatory")
-    private String password;
-
-    @NotEmpty(message = "Role is mandatory")
     private String role;
-
     private String issuedBook;
 }

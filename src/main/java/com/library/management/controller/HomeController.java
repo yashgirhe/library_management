@@ -12,6 +12,11 @@ public class HomeController {
         return "login";
     }
 
+    @GetMapping("/logout")
+    public String afterLogout() {
+        return "login";
+    }
+
     @GetMapping("/admin/home")
     public String adminHome() {
         return "adminhome";
