@@ -43,8 +43,8 @@ public class BookController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = Book.class))})})
     @PostMapping("/admin/book")
-    public ResponseEntity<Book> addBook(@Valid @RequestBody BookDto bookDto) {
-        Book savedBook = bookService.addBook(bookDto);
+    public ResponseEntity<BookDto> addBook(@Valid @RequestBody BookDto bookDto) {
+        BookDto savedBook = bookService.addBook(bookDto);
         return new ResponseEntity<>(savedBook, HttpStatus.CREATED);
     }
 
@@ -126,27 +126,6 @@ public class BookController {
     public ResponseEntity<?> deleteBookByName(@PathVariable("name") String name) {
         bookService.getBookByName(name);
         bookService.deleteByName(name);
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
-    }
-
-    @Operation(
-            summary = "Delete book by id"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "202",
-                    description = "Book deleted Successfully",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Book.class))}),
-            @ApiResponse(responseCode = "404",
-                    description = "Book not found",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Book.class))}),
-    })
-    @DeleteMapping("/admin/book/{id}")
-    public ResponseEntity<?> deleteBookById(@PathVariable("id") int id) {
-        bookService.getBookById(id);
-        bookService.deleteById(id);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

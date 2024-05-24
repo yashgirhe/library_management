@@ -22,7 +22,22 @@ public class BookService {
     @Autowired
     UserRepository userRepository;
 
-    public Book addBook(BookDto bookDto) {
+    private BookDto convertToBookDto(Book book) {
+        BookDto bookDto = new BookDto();
+        bookDto.setTitle(book.getTitle());
+        bookDto.setAuthor(book.getAuthor());
+        // Check if the User object is null before accessing its properties
+        if (book.getUser() != null) {
+            bookDto.setUser(book.getUser().getUsername());
+            bookDto.setIsIssued(true);
+        } else {
+            bookDto.setUser(null);
+            bookDto.setIsIssued(false);// Or set a default value if necessary
+        }
+        return bookDto;
+    }
+
+    public BookDto addBook(BookDto bookDto) {
         //check if book already exist by title
         Optional<Book> bookExistByTitle = Optional.ofNullable(bookRepository.findByTitle(bookDto.getTitle()));
         if (bookExistByTitle.isPresent()) {
@@ -31,73 +46,19 @@ public class BookService {
         Book book = new Book();
         book.setTitle(bookDto.getTitle());
         book.setAuthor(bookDto.getAuthor());
-        book.setIsIssued(bookDto.getIsIssued());
-        // If username is not provided, save the book without a user
-        if (bookDto.getUsername() == null) {
-            return bookRepository.save(book);
-        } else {
-            // If username is provided
-            User user = userRepository.findByUsername(bookDto.getUsername());
-            // If user does not exist
-            if (user == null) {
-                throw new ResourceNotFoundException("User not found with name: " + bookDto.getUsername());
-            }
-            // If user is present
-            //check if user is already associated with a book
-            User userExist = userRepository.findByUsername(bookDto.getUsername());
-            Optional<Book> bookMapped = Optional.ofNullable(userExist.getIssuedBook());
-            if (bookMapped.isPresent()) {
-                throw new IllegalArgumentException("User '" + userExist.getUsername() + "' already issued a book.");
-            }
-            //else associate the user with the book
-            book.setUser(user);
-            Book savedBook = bookRepository.save(book);
-
-            // Update the user's issued book and save the user entity
-            user.setIssuedBook(savedBook);
-            userRepository.save(user);
-
-            return savedBook;
-        }
+        book.setUser(null);
+        book.setIsIssued(false);
+        bookRepository.save(book);
+        return convertToBookDto(book);
     }
+
 
     public BookDto getBookByName(String name) {
         Book book = bookRepository.findByTitle(name);
         if (book == null) {
             throw new ResourceNotFoundException("Book not found with name: " + name);
         } else {
-            BookDto bookDto = new BookDto();
-            bookDto.setId(book.getId());
-            bookDto.setTitle(book.getTitle());
-            bookDto.setAuthor(book.getAuthor());
-            bookDto.setIsIssued(book.getIsIssued());
-            // Check if the User object is null before accessing its properties
-            if (book.getUser() != null) {
-                bookDto.setUsername(book.getUser().getUsername());
-            } else {
-                bookDto.setUsername(null); // Or set a default value if necessary
-            }
-            return bookDto;
-        }
-    }
-
-    public Optional<BookDto> getBookById(int id) {
-        Optional<Book> book = bookRepository.findById(id);
-        if (book.isEmpty()) {
-            throw new ResourceNotFoundException("Book not found with id: " + id);
-        } else {
-            BookDto bookDto = new BookDto();
-            bookDto.setId(book.get().getId());
-            bookDto.setTitle(book.get().getTitle());
-            bookDto.setAuthor(book.get().getAuthor());
-            bookDto.setIsIssued(book.get().getIsIssued());
-            // Check if the User object is null before accessing its properties
-            if (book.get().getUser() != null) {
-                bookDto.setUsername(book.get().getUser().getUsername());
-            } else {
-                bookDto.setUsername(null); // Or set a default value if necessary
-            }
-            return Optional.of(bookDto);
+            return convertToBookDto(book);
         }
     }
 
@@ -108,45 +69,30 @@ public class BookService {
                 .collect(Collectors.toList());
     }
 
-    private BookDto convertToBookDto(Book book) {
-        BookDto bookDto = new BookDto();
-        bookDto.setId(book.getId());
-        bookDto.setTitle(book.getTitle());
-        bookDto.setAuthor(book.getAuthor());
-        bookDto.setIsIssued(book.getIsIssued());
-        // Check if the User object is null before accessing its properties
-        if (book.getUser() != null) {
-            bookDto.setUsername(book.getUser().getUsername());
-        } else {
-            bookDto.setUsername(null); // Or set a default value if necessary
-        }
-        return bookDto;
-    }
-
     public BookDto updateBook(String name, BookDto bookDto) {
-        Book bookToUpdate = bookRepository.findByTitle(bookDto.getTitle());
+        Book bookToUpdate = bookRepository.findByTitle(name);
         bookToUpdate.setTitle(bookDto.getTitle());
         bookToUpdate.setAuthor(bookDto.getAuthor());
-        bookToUpdate.setIsIssued(bookDto.getIsIssued());
         // If username is not provided, remove existing user association
-        if (bookDto.getUsername() == null) {
+        if (bookDto.getUser() == null) {
             bookToUpdate.setUser(null);
+            bookToUpdate.setIsIssued(false);
             return convertToBookDto(bookRepository.save(bookToUpdate));
         } else {
             // If username is provided
-            User user = userRepository.findByUsername(bookDto.getUsername());
+            User userExist = userRepository.findByUsername(bookDto.getUser());
             // If user does not exist
-            if (user == null) {
-                throw new ResourceNotFoundException("User not found with name: " + bookDto.getUsername());
+            if (userExist == null) {
+                throw new ResourceNotFoundException("User not found with name: " + bookDto.getUser());
             }
             // If user is present
-            User userExist = userRepository.findByUsername(bookDto.getUsername());
             //if user is not associated with a book
             if (userExist != null && userExist.getIssuedBook() == null) {
-                bookToUpdate.setUser(user);
+                bookToUpdate.setUser(userExist);
+                bookToUpdate.setIsIssued(true);
                 Book savedBook = bookRepository.save(bookToUpdate);
-                user.setIssuedBook(savedBook);
-                userRepository.save(user);
+                userExist.setIssuedBook(savedBook);
+                userRepository.save(userExist);
                 return convertToBookDto(savedBook);
             }
             //if user is already associated with another book
@@ -155,10 +101,10 @@ public class BookService {
             }
             //if same user provided
             if (userExist != null && userExist.getIssuedBook().getTitle().equals(bookDto.getTitle())) {
-                bookToUpdate.setUser(user);
+                bookToUpdate.setUser(userExist);
                 Book savedBook = bookRepository.save(bookToUpdate);
-                user.setIssuedBook(savedBook);
-                userRepository.save(user);
+                userExist.setIssuedBook(savedBook);
+                userRepository.save(userExist);
                 return convertToBookDto(savedBook);
             }
         }

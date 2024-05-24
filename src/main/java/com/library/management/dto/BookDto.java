@@ -11,12 +11,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class BookDto {
-    private int id;
 
     @NotEmpty(message = "Title is mandatory")
     private String title;
-
     private String author;
+    private String user;
     private Boolean isIssued;
-    private String username;
 }
