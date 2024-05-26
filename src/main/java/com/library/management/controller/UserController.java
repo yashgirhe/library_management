@@ -78,8 +78,8 @@ public class UserController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = User.class))})})
     @PostMapping("/public/user")
-    public ResponseEntity<GetUserDto> addUser(@Valid @RequestBody PostUserDto getUserDto) {
-        GetUserDto userAdded = userService.addUser(getUserDto);
+    public ResponseEntity<GetUserDto> addUser(@Valid @RequestBody PostUserDto postUserDto) {
+        GetUserDto userAdded = userService.addUser(postUserDto);
         return new ResponseEntity<>(userAdded, HttpStatus.CREATED);
     }
 

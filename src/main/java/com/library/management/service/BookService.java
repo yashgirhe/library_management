@@ -24,6 +24,7 @@ public class BookService {
 
     private BookDto convertToBookDto(Book book) {
         BookDto bookDto = new BookDto();
+        bookDto.setId(book.getId());
         bookDto.setTitle(book.getTitle());
         bookDto.setAuthor(book.getAuthor());
         // Check if the User object is null before accessing its properties
