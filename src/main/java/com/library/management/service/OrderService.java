@@ -1,6 +1,5 @@
 package com.library.management.service;
 
-import com.library.management.dto.OrderDto;
 import com.library.management.entities.Book;
 import com.library.management.entities.Order;
 import com.library.management.entities.User;
@@ -24,15 +23,15 @@ public class OrderService {
     @Autowired
     UserRepository userRepository;
 
-    public Order createOrder(OrderDto orderDto) {
-        User user = userRepository.findById(orderDto.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + orderDto.getUserId()));
-        Book book = bookRepository.findById(orderDto.getBookId())
-                .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + orderDto.getBookId()));
+    public Order createOrder(int userId, int bookId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " +userId));
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + bookId));
 
         // Check if the book is already issued
         if (book.getIsIssued()) {
-            throw new MultipleIssueException("The book with id " + orderDto.getBookId() + " is already issued.");
+            throw new MultipleIssueException("The book with id " + bookId + " is already issued.");
         }
 
         //check if user already issued any book

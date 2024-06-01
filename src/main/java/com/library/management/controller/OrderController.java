@@ -1,8 +1,8 @@
 package com.library.management.controller;
 
-import com.library.management.dto.OrderDto;
 import com.library.management.entities.Book;
 import com.library.management.entities.Order;
+import com.library.management.model.CustomUserDetail;
 import com.library.management.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,7 +14,9 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,9 +42,10 @@ public class OrderController {
             @ApiResponse(responseCode = "404", description = "Not Found: Book/User not found",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = Book.class))})})
-    @PostMapping("/public/order")
-    public ResponseEntity<Order> createOrder(@Valid @RequestBody OrderDto orderDto) {
-        Order order = orderService.createOrder(orderDto);
+    @PostMapping("/public/order/{id}")
+    public ResponseEntity<Order> createOrder(@AuthenticationPrincipal CustomUserDetail customUserDetail,@PathVariable("id") int bookId) {
+        int userId = customUserDetail.getId();
+        Order order = orderService.createOrder(userId, bookId);
         return new ResponseEntity<>(order, HttpStatus.CREATED);
     }
 }

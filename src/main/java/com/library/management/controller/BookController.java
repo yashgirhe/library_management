@@ -113,7 +113,7 @@ public class BookController {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "202",
+                    responseCode = "204",
                     description = "Book deleted Successfully",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = Book.class))}),

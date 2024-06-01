@@ -5,6 +5,7 @@ import com.library.management.dto.PostUserDto;
 import com.library.management.dto.UserUpdateUserDto;
 import com.library.management.dto.GetUserDto;
 import com.library.management.entities.User;
+import com.library.management.model.CustomUserDetail;
 import com.library.management.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,6 +17,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,7 +48,7 @@ public class UserController {
     @GetMapping("/public/user/{username}")
     public ResponseEntity<GetUserDto> getUserByName(@PathVariable("username") String username) {
         GetUserDto user = userService.getUserByName(username);
-        return ResponseEntity.ok(user);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @Operation(
@@ -61,7 +63,7 @@ public class UserController {
     @GetMapping("/public/user")
     public ResponseEntity<List<GetUserDto>> getAllUsers() {
         List<GetUserDto> list = userService.getAllUsers();
-        return ResponseEntity.ok(list);
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
     @Operation(
@@ -140,7 +142,7 @@ public class UserController {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "202",
+                    responseCode = "204",
                     description = "User deleted Successfully",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = User.class))}),
@@ -154,5 +156,10 @@ public class UserController {
         userService.getUserByName(username);
         userService.deleteUserByName(username);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("/public/current-user")
+    public ResponseEntity<CustomUserDetail> getCurrentUser(@AuthenticationPrincipal CustomUserDetail customUserDetail){
+        return new ResponseEntity<>(customUserDetail,HttpStatus.OK);
     }
 }

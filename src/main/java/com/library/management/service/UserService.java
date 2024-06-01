@@ -7,8 +7,11 @@ import com.library.management.dto.GetUserDto;
 import com.library.management.entities.User;
 import com.library.management.exceptionhandler.DuplicateEntryException;
 import com.library.management.exceptionhandler.ResourceNotFoundException;
+import com.library.management.model.CustomUserDetail;
 import com.library.management.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -121,4 +124,12 @@ public class UserService {
     public void deleteUserByName(String name) {
         userRepository.removeByUsername(name);
     }
+
+//    public CustomUserDetail getCurrentUserDetails(){
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetail){
+//            return (CustomUserDetail) authentication.getPrincipal();
+//        }
+//        return null;
+//    }
 }
