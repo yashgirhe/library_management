@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +17,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @Validated
@@ -43,9 +41,25 @@ public class OrderController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = Book.class))})})
     @PostMapping("/public/order/{id}")
-    public ResponseEntity<Order> createOrder(@AuthenticationPrincipal CustomUserDetail customUserDetail,@PathVariable("id") int bookId) {
+    public ResponseEntity<Order> issueBook(@AuthenticationPrincipal CustomUserDetail customUserDetail, @PathVariable("id") int bookId) {
         int userId = customUserDetail.getId();
-        Order order = orderService.createOrder(userId, bookId);
+        Order order = orderService.issueBook(userId, bookId);
         return new ResponseEntity<>(order, HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Return book"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Book returned successfully",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Order.class))}),
+            @ApiResponse(responseCode = "404", description = "No book to return",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Book.class))})})
+    @PostMapping("/public/order/")
+    public ResponseEntity<String> returnBook(@AuthenticationPrincipal CustomUserDetail customUserDetail) {
+        orderService.returnBook(customUserDetail.getId());
+        return new ResponseEntity<>("Book returned successfully", HttpStatus.OK);
     }
 }

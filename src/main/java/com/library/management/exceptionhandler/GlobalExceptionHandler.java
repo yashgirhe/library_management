@@ -42,8 +42,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(MultipleIssueException.class)
-    public ResponseEntity<ErrorResponse> handleMultipleIssueException(MultipleIssueException ex){
+    @ExceptionHandler(MultipleIssuedException.class)
+    public ResponseEntity<ErrorResponse> handleMultipleIssueException(MultipleIssuedException ex){
         ErrorResponse errorResponse = new ErrorResponse(ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
