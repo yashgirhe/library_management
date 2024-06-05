@@ -22,7 +22,7 @@ public class BookService {
     @Autowired
     UserRepository userRepository;
 
-    private BookDto convertToBookDto(Book book) {
+    public BookDto convertToBookDto(Book book) {
         BookDto bookDto = new BookDto();
         bookDto.setId(book.getId());
         bookDto.setTitle(book.getTitle());
