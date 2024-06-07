@@ -2,9 +2,11 @@ package com.library.management.service;
 
 import com.library.management.dto.BookDto;
 import com.library.management.entities.Book;
+import com.library.management.entities.User;
 import com.library.management.exceptionhandler.DuplicateEntryException;
 import com.library.management.exceptionhandler.ResourceNotFoundException;
 import com.library.management.repository.BookRepository;
+import com.library.management.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -17,8 +19,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class BookServiceTest {
 
@@ -28,6 +29,8 @@ public class BookServiceTest {
 
     @Mock
     private BookRepository bookRepository;
+    @Mock
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {
@@ -120,5 +123,117 @@ public class BookServiceTest {
         });
         //Assert
         assertEquals("Book with title '" + bookDto.getTitle() + "' already exists.", exception.getMessage());
+    }
+
+    @Test
+    void testDeleteByName() {
+        //Arrange
+        String bookName = "Harry Potter";
+        //Act
+        bookService.deleteByName(bookName);
+        //Assert
+        verify(bookRepository, times(1)).removeByTitle(bookName);
+    }
+
+    @Test
+    void testDeleteById() {
+        //Arrange
+        int bookId = 1;
+        //Act
+        bookService.deleteById(bookId);
+        //Assert
+        verify(bookRepository, times(1)).deleteById(bookId);
+    }
+
+    @Test
+    void updateBook_usernameNotProvided_success() {
+        //Arrange
+        String bookName = "Harry Potter";
+        BookDto bookDto = new BookDto(1, "Harry Potter", "J.K.R", null, false);
+
+        Book bookToUpdate = new Book();
+        bookToUpdate.setTitle(bookDto.getTitle());
+        bookToUpdate.setAuthor(bookDto.getAuthor());
+
+        when(bookRepository.findByTitle(bookName)).thenReturn(bookToUpdate);
+        when(bookRepository.save(any(Book.class))).thenReturn(bookToUpdate);
+        doReturn(bookDto).when(bookService).convertToBookDto(any(Book.class));
+        //Act
+        BookDto result = bookService.updateBook(bookName, bookDto);
+        //Assert
+        assertNotNull(result);
+        assertEquals(bookDto.getTitle(), result.getTitle());
+    }
+
+    @Test
+    void updateBook_usernameProvided_userNotFound() {
+        //Arrange
+        String bookName = "Harry Potter";
+        BookDto bookDto = new BookDto(1, "Harry Potter", "J.K.R", "user1", false);
+
+        Book bookToUpdate = new Book();
+        bookToUpdate.setTitle(bookDto.getTitle());
+        bookToUpdate.setAuthor(bookDto.getAuthor());
+
+        when(bookRepository.findByTitle(bookName)).thenReturn(bookToUpdate);
+        when(userRepository.findByUsername(bookDto.getUser())).thenReturn(null);
+        //Act
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
+            bookService.updateBook(bookName, bookDto);
+        });
+        //Assert
+        assertEquals("User not found with name: " + bookDto.getUser(), exception.getMessage());
+    }
+
+    @Test
+    void updateBook_usernameProvided_userNotIssuedAnotherBook() {
+        //Arrange
+        String bookName = "Harry Potter";
+        BookDto bookDto = new BookDto(1, "Harry Potter", "J.K.R", "user1", false);
+
+        Book bookToUpdate = new Book();
+        bookToUpdate.setTitle(bookDto.getTitle());
+        bookToUpdate.setAuthor(bookDto.getAuthor());
+
+        User userExist = new User();
+        userExist.setUsername(bookDto.getUser());
+        userExist.setIssuedBook(null);
+
+        when(bookRepository.findByTitle(bookName)).thenReturn(bookToUpdate);
+        when(userRepository.findByUsername(bookDto.getUser())).thenReturn(userExist);
+        when(bookRepository.save(any(Book.class))).thenReturn(bookToUpdate);
+        doReturn(bookDto).when(bookService).convertToBookDto(any(Book.class));
+        //Act
+        BookDto result = bookService.updateBook(bookName, bookDto);
+        //Assert
+        assertNotNull(result);
+        assertEquals(bookDto.getTitle(), result.getTitle());
+        assertEquals(bookDto.getAuthor(), result.getAuthor());
+    }
+
+    @Test
+    void updateBook_usernameProvided_userAlreadyIssuedSameBook() {
+        //Arrange
+        String bookName = "Harry Potter";
+        BookDto bookDto = new BookDto(1, "Harry Potter", "J.K.R", "user1", false);
+
+        Book bookToUpdate = new Book();
+        bookToUpdate.setTitle(bookDto.getTitle());
+        bookToUpdate.setAuthor("J.K");
+
+        User userExist = new User();
+        userExist.setUsername(bookDto.getUser());
+        userExist.setIssuedBook(bookToUpdate);
+
+        when(bookRepository.findByTitle(bookName)).thenReturn(bookToUpdate);
+        when(userRepository.findByUsername(bookDto.getUser())).thenReturn(userExist);
+        when(bookRepository.save(any(Book.class))).thenReturn(bookToUpdate);
+        doReturn(bookDto).when(bookService).convertToBookDto(any(Book.class));
+        //Act
+        BookDto result = bookService.updateBook(bookName, bookDto);
+        //Assert
+        assertNotNull(result);
+        assertEquals(bookDto.getTitle(), result.getTitle());
+        assertEquals(bookDto.getAuthor(), result.getAuthor());
     }
 }
