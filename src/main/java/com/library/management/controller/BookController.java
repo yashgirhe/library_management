@@ -33,12 +33,6 @@ public class BookController {
             @ApiResponse(responseCode = "201", description = "Book added successfully",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = Book.class))}),
-            @ApiResponse(responseCode = "400", description = "Bad Request: Invalid data or user already has a book issued",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Book.class))}),
-            @ApiResponse(responseCode = "404", description = "Not Found: User not found",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Book.class))}),
             @ApiResponse(responseCode = "409", description = "Conflict: Book with the given title already exists",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = Book.class))})})
