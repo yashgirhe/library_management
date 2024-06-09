@@ -1,9 +1,9 @@
 package com.library.management.controller;
 
 import com.library.management.dto.AdminUpdateUserDto;
+import com.library.management.dto.GetUserDto;
 import com.library.management.dto.PostUserDto;
 import com.library.management.dto.UserUpdateUserDto;
-import com.library.management.dto.GetUserDto;
 import com.library.management.entities.User;
 import com.library.management.model.CustomUserDetail;
 import com.library.management.service.UserService;
@@ -159,7 +159,7 @@ public class UserController {
     }
 
     @GetMapping("/public/current-user")
-    public ResponseEntity<CustomUserDetail> getCurrentUser(@AuthenticationPrincipal CustomUserDetail customUserDetail){
-        return new ResponseEntity<>(customUserDetail,HttpStatus.OK);
+    public ResponseEntity<CustomUserDetail> getCurrentUser(@AuthenticationPrincipal CustomUserDetail customUserDetail) {
+        return new ResponseEntity<>(customUserDetail, HttpStatus.OK);
     }
 }
