@@ -3,13 +3,16 @@ package com.library.management.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.library.management.dto.BookDto;
 import com.library.management.exceptionhandler.DuplicateEntryException;
+import com.library.management.exceptionhandler.GlobalExceptionHandler;
 import com.library.management.exceptionhandler.ResourceNotFoundException;
 import com.library.management.repository.UserRepository;
 import com.library.management.service.BookService;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -127,20 +130,21 @@ public class BookControllerTest {
                 .andExpect(jsonPath("$.message").value("Book not found with name: " + bookName));
     }
 
-//    @Test
-//    void testUpdateBook_userAlreadyIssuedAnotherBook() throws Exception {
-//        String bookName = "Harry Potter";
-//        String userName = "user1";
-//        BookDto bookDto = new BookDto(1, "Harry Potter", "J.K.R", userName, false);
-//        doThrow(new IllegalArgumentException("User '" + userName + "' already issued a book.")).when(bookService).updateBook(bookName, bookDto);
-//
-//        mockMvc.perform(put("/admin/book/"+bookName)
-//                        .with(csrf())
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(objectMapper.writeValueAsString(bookDto)))
-//                .andExpect(status().isBadRequest())
-//                .andExpect(jsonPath("$.message").value("User '" + userName + "' already issued a book."));
-//    }
+    @Test
+    @Disabled
+    void testUpdateBook_userAlreadyIssuedAnotherBook() throws Exception {
+        String bookName = "Harry Potter";
+        String userName = "user1";
+        BookDto bookDto = new BookDto(1, "Harry Potter", "J.K.R", userName, false);
+        doThrow(new IllegalArgumentException("User '" + userName + "' already issued a book.")).when(bookService).updateBook(bookName, bookDto);
+
+        mockMvc.perform(put("/admin/book/"+bookName)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(bookDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("User '" + userName + "' already issued a book."));
+    }
 
     @Test
     void testDeleteBookByName() throws Exception {

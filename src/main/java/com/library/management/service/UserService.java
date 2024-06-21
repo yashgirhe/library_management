@@ -30,7 +30,7 @@ public class UserService {
         return new BCryptPasswordEncoder();
     }
 
-    private GetUserDto convertToGetUserDto(User user) {
+    public GetUserDto convertToGetUserDto(User user) {
         GetUserDto getUserDto = new GetUserDto();
         getUserDto.setId(user.getId());
         getUserDto.setUsername(user.getUsername());
